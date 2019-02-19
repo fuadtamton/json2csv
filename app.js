@@ -1,32 +1,29 @@
 const axios = require('axios');
-const conf = require('config');
-const { csvGeneration } = require('./helper')
-let data = '';
 var sleep = require('sleep');
-let csv = "node name,host,bulkQueue,searchQueue,refreshQueue\n";
+const conf = require('config');
 
+const { csvGeneration } = require('./helper')
+
+let data = '';
 config = conf.get('config')
-function initiator(config) {
+
+async function csvGenerator(host, port, api) {
+    console.log("on getdata")
     let i = 0
     while (i < config.numberOfCount) {
         console.log("init loop")
-        getData(config.host, config.port, config.thread_pool_api)
-        // getData(config.host, config.port, config.fs)
+        await axios.get(`${host}:${port}${api}`)
+            .then(res => {
+                console.log("on axios")
+                data = res.data
+                csvGeneration(api, config, data)
+            })
+            .catch(e => {
+                return console.log("ERROR ")
+            })
+        sleep.sleep(config.intervalInSeconds);
         i++
     }
 }
-initiator(config)
 
-async function getData(host, port, api) {
-    console.log("on getdata")
-   await axios.get(`${host}:${port}${api}`)
-        .then(res => {
-            console.log("on axios")
-            sleep.sleep(config.intervalInSeconds);
-            data = res.data
-           csvGeneration(api, config, data)
-        })
-        .catch(e => {
-            return console.log("ERROR ")
-        })
-}
+csvGenerator(config.host, config.port, config.thread_pool_api)
