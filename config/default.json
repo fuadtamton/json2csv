@@ -1,0 +1,10 @@
+{
+    "config": {
+        "host": "http://localhost",
+        "port": 9200,
+        "thread_pool_api": "/_nodes/stats/thread_pool",
+        "fs_api": "/node/stats/fs",
+        "numberOfCount": 12,
+        "intervalInSeconds": "5"
+    }
+}
